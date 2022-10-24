@@ -1,26 +1,36 @@
 /// <reference types="cypress" />
 
+import {
+  navigate,
+  addTodo,
+  validateTodoText,
+  toggleTodo,
+  clearCompletedTodos,
+  validateTodoCompletedState,
+  validateToggleState,
+  validateNumberofTodosShown,
+} from '../page-objects/todo-page';
+
 describe('todo actions', () => {
   beforeEach(() => {
-    cy.visit('http://todomvc-app-for-testing.surge.sh');
-    cy.get('.new-todo', { timeout: 6000 }).type('learn cypress{enter}');
-  })
+    navigate();
+    addTodo('learn cypress');
+  });
 
   //default timeout for cypress is 4 seconds. If specified timeout in the url is longer than that, add a timeout option to the cy.get function to override cypress defaults.
   it('should add a new todo to the list', () => {
-    cy.get('label').should('have.text', 'learn cypress');
+    validateTodoText(0, 'learn cypress');
+    validateToggleState(0, false);
   });
 
   it('should be able to click on a todo to mark it completed', () => {
-    cy.get('.toggle').should('not.to.be.checked');
-    cy.get('.toggle').click();
-    cy.get('label').should('have.css', 'text-decoration-line', 'line-through');
+    toggleTodo(0);
+    validateTodoCompletedState(0, true);
   });
 
   it('should clear all completed todos on clicking clear completed button', () => {
-    cy.get('.toggle').click();
-    //cy.contains finds elements that contain certain text
-    cy.contains(/clear/i).click();
-    cy.get('.todo-list').should('not.have.descendants', 'li');
+    toggleTodo(0);
+    clearCompletedTodos();
+    validateNumberofTodosShown(0);
   });
 });
